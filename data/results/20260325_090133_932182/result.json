@@ -1,0 +1,31 @@
+{
+  "record_id": "20260325_090133_932182",
+  "created_at": "2026-03-25T09:01:33",
+  "operator": "tester",
+  "note": "integration",
+  "measurements": [
+    {
+      "measurement_id": "6fb0652457ba4e8e8c37726548d3a04e",
+      "camera_id": "mock-cam-1",
+      "column_id": 1,
+      "height_px": 120.0,
+      "height_mm": 10.909090909090908,
+      "top_point": {
+        "x": 130.0,
+        "y": 164.0
+      },
+      "bottom_point": {
+        "x": 130.0,
+        "y": 284.0
+      },
+      "confidence": 0.0,
+      "measured_at": "2026-03-25T01:01:33.915136Z"
+    }
+  ],
+  "image_paths": [
+    "/results/20260325_090133_932182/mock-cam-1.png"
+  ],
+  "disk_image_paths": [
+    "C:\\Users\\michelin.zhang\\camera_hk\\data\\results\\20260325_090133_932182\\mock-cam-1.png"
+  ]
+}
