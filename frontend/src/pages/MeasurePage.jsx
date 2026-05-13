@@ -28,6 +28,7 @@ export default function MeasurePage({
   const [pickMode, setPickMode] = useState("top");
   const [draft, setDraft] = useState(null);
   const [message, setMessage] = useState("");
+  const [showGuide, setShowGuide] = useState(true);
 
   const columnMap = session?.column_camera_map || {};
   const activeCameraIds = session?.active_camera_ids || [];
@@ -188,6 +189,21 @@ export default function MeasurePage({
 
         <aside className="control-panel">
           <h3>Reading Panel 读数面板</h3>
+
+          {showGuide && (
+            <div className="guide-banner">
+              <strong>Quick Guide 操作指南:</strong>
+              <ol>
+                <li>Select column (C1-C4) 选择列</li>
+                <li>Click image to mark TOP point 点击图像标上限</li>
+                <li>Click image to mark BOTTOM point 点击图像标下限</li>
+                <li>Repeat for other columns 重复其他列</li>
+                <li>Click "Save" to store results 保存结果</li>
+              </ol>
+              <button className="chip" onClick={() => setShowGuide(false)}>Got it 知道了</button>
+            </div>
+          )}
+
           <div className="column-chooser">
             {[1, 2, 3, 4].map((id) => (
               <button

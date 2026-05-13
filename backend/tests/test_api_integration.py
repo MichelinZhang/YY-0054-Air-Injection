@@ -31,8 +31,9 @@ def test_api_flow_mock_mode() -> None:
 
     assert _wait_frame(camera_id)
 
-    cal_resp = client.post("/api/calibration", json={"entries": []})
-    assert cal_resp.status_code == 410
+    cal_get = client.get("/api/calibration")
+    assert cal_get.status_code == 200
+    assert "scale_mm_per_tick" in cal_get.json()
 
     measure_resp = client.post(
         "/api/measure",

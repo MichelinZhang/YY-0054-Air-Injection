@@ -111,6 +111,18 @@ export default function App() {
     bootstrap();
   }, []);
 
+  useEffect(() => {
+    if (!notice) return;
+    const timer = setTimeout(() => setNotice(""), 4000);
+    return () => clearTimeout(timer);
+  }, [notice]);
+
+  useEffect(() => {
+    if (!error) return;
+    const timer = setTimeout(() => setError(""), 8000);
+    return () => clearTimeout(timer);
+  }, [error]);
+
   const withFeedback = async (fn, okMessage = "") => {
     setError("");
     setNotice("");
@@ -198,26 +210,40 @@ export default function App() {
     });
   };
 
-  const onSaveResult = async () => {
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [saveOperator, setSaveOperator] = useState("");
+  const [saveNote, setSaveNote] = useState("");
+
+  const onSaveRequest = () => {
     if (readingCount === 0) {
       setError("No readings to save yet / 暂无可保存读数");
       return;
     }
+    setShowSaveDialog(true);
+  };
 
+  const onSaveConfirm = async () => {
+    setShowSaveDialog(false);
     setBusySave(true);
     try {
       await withFeedback(async () => {
         const resp = await api.saveResult({
           measurements: Object.values(readings),
-          operator: null,
-          note: null,
+          operator: saveOperator.trim() || null,
+          note: saveNote.trim() || null,
         });
+        setSaveOperator("");
+        setSaveNote("");
         setPage("history");
         return resp;
       }, "Result saved / 结果已保存");
     } finally {
       setBusySave(false);
     }
+  };
+
+  const onSaveCancel = () => {
+    setShowSaveDialog(false);
   };
 
   const goPage = (next) => {
@@ -260,6 +286,11 @@ export default function App() {
         </div>
       </header>
 
+      {session?.using_mock && (
+        <div className="mock-global-banner">
+          MOCK MODE ACTIVE / 当前为模拟模式 — 数据非真实采集，仅用于调试
+        </div>
+      )}
       {error && <div className="error-banner">{error}</div>}
       {notice && <div className="notice-banner">{notice}</div>}
       {booting && <div className="hint">Loading... 正在加载</div>}
@@ -284,7 +315,7 @@ export default function App() {
             session={session}
             readings={readings}
             onMeasure={onMeasure}
-            onSaveResult={onSaveResult}
+            onSaveResult={onSaveRequest}
             onToggleLight={onToggleLight}
             lightState={lightState}
             busySave={busySave}
@@ -296,6 +327,43 @@ export default function App() {
         )}
         {page === "history" && <HistoryPage />}
       </main>
+
+      {showSaveDialog && (
+        <div className="dialog-overlay" onClick={onSaveCancel}>
+          <div className="dialog-box" onClick={(e) => e.stopPropagation()}>
+            <h3>Save Results 保存结果</h3>
+            <p className="hint">Readings to save 待保存读数: {readingCount}</p>
+            {session?.using_mock && (
+              <div className="mock-warn-inline">Mock mode active / 当前为模拟模式</div>
+            )}
+            <label>
+              <span>Operator 操作员 *</span>
+              <input
+                type="text"
+                value={saveOperator}
+                onChange={(e) => setSaveOperator(e.target.value)}
+                placeholder="Enter operator name / 输入操作员姓名"
+                autoFocus
+              />
+            </label>
+            <label>
+              <span>Note 备注</span>
+              <textarea
+                value={saveNote}
+                onChange={(e) => setSaveNote(e.target.value)}
+                placeholder="Optional notes / 可选备注"
+                rows={3}
+              />
+            </label>
+            <div className="dialog-actions">
+              <button className="btn-cancel" onClick={onSaveCancel}>Cancel 取消</button>
+              <button className="btn-confirm" onClick={onSaveConfirm} disabled={busySave}>
+                {busySave ? "Saving... 保存中" : "Confirm Save 确认保存"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

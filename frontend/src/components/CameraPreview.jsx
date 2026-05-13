@@ -310,6 +310,18 @@ export default function CameraPreview({
     }
   };
 
+  const shellRef = useRef(null);
+
+  const toggleFullscreen = () => {
+    const el = shellRef.current;
+    if (!el) return;
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+    } else {
+      el.requestFullscreen?.();
+    }
+  };
+
   const bumpSetting = async (field, delta) => {
     if (!settings || settingsBusy || !onAdjustSettings) return;
     const range =
@@ -334,6 +346,7 @@ export default function CameraPreview({
 
   return (
     <motion.section
+      ref={shellRef}
       layout
       className={`preview-shell ${selected ? "selected" : ""}`}
       initial={{ opacity: 0, y: 16 }}
@@ -397,6 +410,9 @@ export default function CameraPreview({
           </button>
           <button className="chip" onClick={resetView}>
             Reset
+          </button>
+          <button className="chip" onClick={toggleFullscreen} title="Fullscreen / 全屏">
+            ⛶
           </button>
         </div>
         <div className="camera-setting-actions">
